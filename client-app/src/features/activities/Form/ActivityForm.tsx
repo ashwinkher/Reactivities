@@ -8,10 +8,11 @@ interface IProps{
     activity: IActivity;
     createActivity: (activity:IActivity)=> void;
     editActivity: (activity:IActivity)=> void;
+    submitting: boolean
 }
 
 
-export const ActivityForm: React.FC<IProps> = ({setEditMode, activity : initialFormState, editActivity,createActivity}) => {
+export const ActivityForm: React.FC<IProps> = ({setEditMode, activity : initialFormState, editActivity,createActivity, submitting}) => {
     const initiazeForm= ()=>{
 
         if(initialFormState){
@@ -33,7 +34,7 @@ venue: ''
 
     const handleInputChange = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
     const {name, value} = event.currentTarget;
-    setActivity({...activity, [name]: [value]})
+    setActivity({...activity, [name]: value})
     }
 
     const handleSubmit = ()=>{
@@ -52,12 +53,12 @@ editActivity(activity);
         <Segment clearing>
             <Form onSubmit={handleSubmit}> 
                 <Form.Input onChange={handleInputChange} name='title' placeholder='title' value={activity.title}></Form.Input>
-                <Form.TextArea onChange={handleInputChange} name='description' rows={2} placeholder='Description' value={activity.description}></Form.TextArea>
+                <Form.Input onChange={handleInputChange} name='description' placeholder='Description' value={activity.description}></Form.Input>
                 <Form.Input onChange={handleInputChange} name='category' placeholder='Category' value = {activity.category}></Form.Input>
-                <Form.Input onChange={handleInputChange} name='date' type='datetime-local ' placeholder='Date' value={activity.date}></Form.Input>
+                <Form.Input onChange={handleInputChange} name='date' type='datetime-local' placeholder='Date' value={activity.date}></Form.Input>
                 <Form.Input onChange={handleInputChange} name='city' placeholder='City' value={activity.city}></Form.Input>
                 <Form.Input onChange={handleInputChange} name='venue' placeholder='Venue' value={activity.venue}></Form.Input>
-                <Button floated='right' positive content='Submit' type='submit'/>
+                <Button floated='right' loading ={submitting} positive content='Submit' type='submit'/>
                 <Button onClick={()=> setEditMode(false)} floated='right' content='Cancel' type='Button'/>
             </Form>
         </Segment>
