@@ -1,41 +1,33 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useContext } from 'react';
 import { Segment, Form, Button } from 'semantic-ui-react';
 import { IActivity } from '../../../models/activity';
 import {v4 as uuid} from 'uuid';
+import ActivityStore from '../../../app/stores/activitystore';
+import { observer } from 'mobx-react-lite';
 
 interface IProps{
-    setEditMode : (editmode : boolean) => void;
     activity: IActivity;
-    createActivity: (activity:IActivity)=> void;
-    editActivity: (activity:IActivity)=> void;
-    submitting: boolean
 }
-
-
-export const ActivityForm: React.FC<IProps> = ({setEditMode, activity : initialFormState, editActivity,createActivity, submitting}) => {
+const ActivityForm: React.FC<IProps> = ({activity : initialFormState}) => {
+    const activityStore = useContext(ActivityStore);
+    const {createActivity, editActivity,submitting,cancelFormOpen} = activityStore;
     const initiazeForm= ()=>{
-
-        if(initialFormState){
-return initialFormState;
+    if(initialFormState){
+       return initialFormState;
         }else{
             return{
-                id:'',
-title: '',
-category: '',
-description:'',
-date: '',
-city: '',
-venue: ''
-}
+              id:'',
+              title: '',
+              category: '',
+              description:'',
+              date: '',
+              city: '',
+              venue: ''
+           };
         }
     };
 
-    const [activity, setActivity] = useState<IActivity>(initiazeForm)
-
-    const handleInputChange = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
-    const {name, value} = event.currentTarget;
-    setActivity({...activity, [name]: value})
-    }
+    const [activity, setActivity] = useState<IActivity>(initiazeForm);
 
     const handleSubmit = ()=>{
         if(activity.id.length ===0){
@@ -47,7 +39,14 @@ venue: ''
         }else{
 editActivity(activity);
         }
+    };
+
+
+    const handleInputChange = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
+    const {name, value} = event.currentTarget;
+    setActivity({...activity, [name]: value})
     }
+
 
     return (
         <Segment clearing>
@@ -59,8 +58,10 @@ editActivity(activity);
                 <Form.Input onChange={handleInputChange} name='city' placeholder='City' value={activity.city}></Form.Input>
                 <Form.Input onChange={handleInputChange} name='venue' placeholder='Venue' value={activity.venue}></Form.Input>
                 <Button floated='right' loading ={submitting} positive content='Submit' type='submit'/>
-                <Button onClick={()=> setEditMode(false)} floated='right' content='Cancel' type='Button'/>
+                <Button onClick={cancelFormOpen} floated='right' content='Cancel' type='Button'/>
             </Form>
         </Segment>
-    )
-}
+    );
+};
+
+export default observer (ActivityForm);
